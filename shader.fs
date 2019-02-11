@@ -37,8 +37,8 @@ struct Source
 Rayon ray;
 Sphere tableau[2],sph;
 Source source;
-float T_min, cos_alpha, cos_theta;
-vec3 I, normal, v0, vi, h, f, li, l0;
+float t_min, cos_alpha, cos_theta;
+vec3 impact, normal, v0, vi, h, f, li, l0;
 
 
 
@@ -124,16 +124,16 @@ void main(void) {
 	ray.o = vec3(0.0,0.0,0.0);
 	ray.v = rayDir;
 		
-	sph = choixSphere(tableau, ray, T_min); // Choisi la sphère la plus proche
+	sph = choixSphere(tableau, ray, t_min); // Choisi la sphère la plus proche
 	
 	
 	
 	if (sph.r != -1.0)
 	{
-		I = ray.v * T_min;
-		normal = normalize(I - sph.c);
+		impact = ray.v * t_min;
+		normal = normalize(impact - sph.c);
 		v0 = normalize(-ray.v);
-		vi = normalize(source.pos-I);
+		vi = normalize(source.pos-impact);
 		h = normalize(vi+v0);
 		cos_alpha = dot(normal, h);
 		f = (sph.properties.kd / 3.14)+(sph.properties.ks*((float(sph.properties.n +8))/(8.0*3.14))) * pow(cos_alpha, float(sph.properties.n));
