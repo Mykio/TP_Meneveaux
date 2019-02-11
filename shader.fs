@@ -99,8 +99,8 @@ Sphere choixSphere(Sphere tableau[2], Rayon r)
 
 void main(void) {
 	
-	tableau[0] = Sphere(vec3(10.0, 180.0, 0.0), vec3(1.0,0.0,0.0), 20.0); //Sphere rouge
-	tableau[1] = Sphere(vec3(0.0, 220.0, 0.0), vec3(0.0,1.0,0.0), 20.0); // Sphere verte
+	tableau[0] = Sphere(vec3(20.0, 200.0, 0.0), vec3(1.0,0.0,0.0), 20.0); //Sphere rouge
+	tableau[1] = Sphere(vec3(0.0, 200.0, 0.0), vec3(0.0,1.0,0.0), 20.0); // Sphere verte
 
 	ray.o = vec3(0.0,0.0,0.0);
 	ray.v = rayDir;
