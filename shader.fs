@@ -13,17 +13,34 @@ struct Rayon
 	float t;
 };
 
-struct Sphere
+struct Brdf
 {
-	vec3 c, kd;
-	float r;
+	vec3 kd;
+	int n;
+	float ks;
 };
 
+
+struct Sphere
+{
+	vec3 c;
+	float r;
+	Brdf properties;
+};
+
+struct Source
+{
+	vec3 puissance, pos;
+};
+
+
 Rayon ray;
-
-
-
 Sphere tableau[2],sph;
+Source source;
+float T_min, cos_alpha, cos_theta;
+vec3 I, normal, v0, vi, h, f, li, l0;
+
+
 
 
 //===========================================================================================================
@@ -68,9 +85,9 @@ float intersectSphere (inout Rayon r, Sphere s)
 
 //==========================================================================================================
 
-Sphere choixSphere(Sphere tableau[2], Rayon r)
+Sphere choixSphere(Sphere tableau[2], Rayon r, out float T)
 {
-	float T = -1.0;
+	T = -1.0;
 	float T_temp;
 	Sphere Si;
 	Si.r = -1.0;
@@ -87,7 +104,7 @@ Sphere choixSphere(Sphere tableau[2], Rayon r)
 				T = T_temp;		
 			}
 		}	
-	}
+	}	
 	return Si;
 }
 
@@ -99,17 +116,31 @@ Sphere choixSphere(Sphere tableau[2], Rayon r)
 
 void main(void) {
 	
-	tableau[0] = Sphere(vec3(10.0, 180.0, 0.0), vec3(1.0,0.0,0.0), 20.0); //Sphere rouge
-	tableau[1] = Sphere(vec3(0.0, 220.0, 0.0), vec3(0.0,1.0,0.0), 20.0); // Sphere verte
+	tableau[0] = Sphere(vec3(0.0, 200.0, 0.0), 20.0, Brdf(vec3(1.0,0.0,0.0), 1, 1.0)); //Sphere rouge
+	tableau[1] = Sphere(vec3(10.0, 200.0, 0.0), 20.0, Brdf(vec3(0.0,1.0,0.0), 1, 1.0)); // Sphere verte
+	
+	source = Source(vec3(2.0,2.0,2.0), vec3(0.0,200.0,300.0));
 
 	ray.o = vec3(0.0,0.0,0.0);
 	ray.v = rayDir;
+		
+	sph = choixSphere(tableau, ray, T_min); // Choisi la sphère la plus proche
 	
-	sph = choixSphere(tableau, ray); // Choisi la sphère la plus proche
+	
 	
 	if (sph.r != -1.0)
 	{
-		gl_FragColor = vec4(sph.kd,1.0);	
+		I = ray.v * T_min;
+		normal = normalize(I - sph.c);
+		v0 = normalize(-ray.v);
+		vi = normalize(source.pos-I);
+		h = normalize(vi+v0);
+		cos_alpha = dot(normal, h);
+		f = (sph.properties.kd / 3.14)+(sph.properties.ks*((float(sph.properties.n +8))/(8.0*3.14))) * pow(cos_alpha, float(sph.properties.n));
+		cos_theta = dot(normal, vi);
+		li = source.puissance;
+		l0 = li * f * cos_theta;
+		gl_FragColor = vec4(l0,1.0);	
 	}
 	
 	else 
